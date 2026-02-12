@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CarRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 class Car
@@ -14,21 +15,33 @@ class Car
     #[ORM\Column(name: 'id')]
     private ?int $id = null;
 
+    #[Assert\NotBlank()]
     #[ORM\Column(name: 'name', length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(min: 20)]
+    #[Assert\NotBlank()]
     #[ORM\Column(name: 'description', type: Types::TEXT)]
     private ?string $description = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\Positive]
     #[ORM\Column(name: 'monthly_price', type: 'decimal', precision: 8, scale: 2)]
     private ?string $monthlyPrice = null;
 
+    #[Assert\LessThan(propertyPath: 'monthlyPrice')]
+    #[Assert\NotBlank()]
+    #[Assert\Positive]
     #[ORM\Column(name: 'daily_price', type: 'decimal', precision: 8, scale: 2)]
     private ?string $dailyPrice = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\Range(min: 1, max: 9)]
+    #[Assert\Type(type: 'integer')]
     #[ORM\Column(name: 'seat_number')]
     private ?int $seatNumber = null;
 
+    #[Assert\NotNull]
     #[ORM\Column(name: 'manual_transmission')]
     private ?bool $manualTransmission = null;
 
