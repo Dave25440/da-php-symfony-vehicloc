@@ -13,10 +13,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CarController extends AbstractController
 {
+    public function __construct(
+        private CarRepository $carRepository,
+        private EntityManagerInterface $manager,
+    ) {}
+
     #[Route('/', name: 'app_home', methods: ['GET'])]
-    public function index(CarRepository $carRepository): Response
+    public function index(): Response
     {
-        $cars = $carRepository->findAll();
+        $cars = $this->carRepository->findAll();
 
         return $this->render('car/index.html.twig', [
             'cars' => $cars,
@@ -36,7 +41,7 @@ final class CarController extends AbstractController
     }
 
     #[Route('/car/new', name: 'app_car_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $manager): Response
+    public function new(Request $request): Response
     {
         $car = new Car();
         $form = $this->createForm(CarType::class, $car);
@@ -44,8 +49,8 @@ final class CarController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $manager->persist($car);
-            $manager->flush();
+            $this->manager->persist($car);
+            $this->manager->flush();
 
             return $this->redirectToRoute('app_car', ['id' => $car->getId()]);
         }
@@ -56,14 +61,14 @@ final class CarController extends AbstractController
     }
 
     #[Route('/car/{id}/delete', name: 'app_car_delete', requirements: ['id' => '\d+'], methods: ['GET', 'DELETE'])]
-    public function delete(?Car $car, EntityManagerInterface $manager): Response
+    public function delete(?Car $car): Response
     {
         if (!$car) {
             return $this->redirectToRoute('app_home');
         }
 
-        $manager->remove($car);
-        $manager->flush();
+        $this->manager->remove($car);
+        $this->manager->flush();
 
         return $this->redirectToRoute('app_home');
     }
