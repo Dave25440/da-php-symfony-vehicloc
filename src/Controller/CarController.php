@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Car;
 use App\Repository\CarRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,18 @@ final class CarController extends AbstractController
 
         return $this->render('car/index.html.twig', [
             'cars' => $cars,
+        ]);
+    }
+
+    #[Route('/car/{id}', name: 'app_car', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(?Car $car): Response
+    {
+        if (!$car) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('car/show.html.twig', [
+            'car' => $car,
         ]);
     }
 }
